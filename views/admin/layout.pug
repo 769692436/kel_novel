@@ -1,0 +1,29 @@
+doctype html
+html
+  head
+    title= title
+    //- link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/admin/css/common.css')
+    link(rel='stylesheet', href='/admin/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/admin/css/index.css')
+    block style
+  body
+    block header
+      nav.header.navbar.navbar-expand
+        a(href="#").navbar-brand.col-1 管理后台
+        button.navbar-toggler(type="button",data-toggle="collapse",data-target="#navbarNav",aria-controls="navbarNav",aria-expanded="false",aria-label="Toggle navigation")
+          span.navbar-toggler-icon
+        div.collapse.navbar-collapse#navbarNav
+          ul.navbar-nav.mr-auto
+            li.nav-item
+              a(href="#").nav-link 主页
+            li.nav-item
+              a(href="#").nav-link 用户管理
+            li.nav-item
+              a(href="/admin/book").nav-link 小说管理
+            li.nav-item
+              a(href="#").nav-link 分类管理
+    block main
+      div.contianer.mt-5.pl-3.pr-3
+        block sidebar
+        block content

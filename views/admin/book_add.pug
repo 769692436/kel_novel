@@ -1,0 +1,43 @@
+extends book
+  
+block content
+  div.card.fl.ml-3.bg-white(style="width: 95rem")
+    div.card-header
+      h4 添加小说信息
+    div.card-body
+      form(method="post", enctype="multipart/form-data", action="/admin/book/add")
+        div.from-group.row
+          label.form-control-label.col-2(for="name") 小说名称
+          div.col-10
+            input.form-control#name(type="text", name="name", placeholder="请输入小说名称")
+        div.from-group.row
+          label.form-control-label.col-2(for="author") 作者
+          div.col-10
+            input.form-control#author(type="text", name="author", placeholder="请输入作者名称")
+        div.form-group.row
+          label.form-control-label.col-2(for="des") 简介
+          div.col-10
+            textarea.form-control.col-10#des(type="text", name="des", placeholder="请输入简介")
+        div.form-group.row
+          label.form-control-label.col-2(for="cid") 类型
+          div.col-10
+            select.form-control#cid(name="cid")
+              option(value="1") 通用
+              option(value="2") 男频
+              option(value="3") 女频
+        div.form-group.row
+          label.form-control-label.col-2(for="state") 小说状态
+          label.col-2
+            input(type="radio", name="state", value="0",  checked) 
+            |连载中
+          label.col-2
+            input(type="radio", name="state", value="1") 
+            |完结
+        div.form-group.row
+          label.form-control-label.col-2(for="cover") 小说封面上传
+          div.col-10
+            input.form-control#cover(type="file")
+        div.form-group.row
+          div.offset-2.col-10
+            button.btn.btn-primary 确认添加
+            

@@ -1,0 +1,49 @@
+extends layout
+
+block style 
+  link(rel='stylesheet', href='/admin/css/book.css')
+
+block sidebar
+  nav.card.fl(style="width: 18rem")
+    div.card-header 小说管理
+    ul.list-group.list-group-flush
+      li.list-group-item
+        a.nav-link(href="#") 小说列表
+      li.list-group-item
+        a.nav-link(href="/admin/book/add") 添加小说
+block content
+  table.table.table-striped.fl.ml-3.bg-white(style="width: 95rem")
+    thead
+      tr
+        th(scope="col") ID
+        th(scope="col") 名称
+        th(scope="col") 作者
+        th(scope="col") 分类
+        th(scope="col") 状态
+        th(scope="col") 操作
+    tbody
+      tr
+        th(scope="row") 1
+        td 圣墟
+        td 辰东
+        td 通用
+        td 连载中
+        td 
+          a.btn.btn-primary.mr-1(href="#") 爬取
+          a.btn.btn-primary.mr-1(href="#") 爬取规则
+          a.btn.btn-primary.mr-1(href="#") 修改
+          a.btn.btn-success.mr-1(href="#") 章节列表
+          a.btn.btn-danger.mr-1(href="#") 删除
+        tr
+          th(scope="row") 2
+          td 圣墟
+          td 辰东
+          td 通用
+          td 连载中
+          td 
+            a.btn.btn-primary.mr-1(href="#") 爬取
+            a.btn.btn-primary.mr-1(href="#") 爬取规则
+            a.btn.btn-primary.mr-1(href="#") 修改
+            a.btn.btn-success.mr-1(href="#") 章节列表
+            a.btn.btn-danger.mr-1(href="#") 删除
+ 
