@@ -1,3 +1,14 @@
 .row{
   margin-bottom: 10px;
 }
+#tips{
+  width: 100%;
+  height: 25px;
+  line-height: 25px;
+  position: absolute;
+  top: 75px;
+  background-color: #fff8ca;
+  color: #ff000f;
+  opacity: 0;
+  text-align: center;
+}

@@ -1,49 +1,71 @@
 extends layout
 
-block style 
+block style
   link(rel='stylesheet', href='/admin/css/book.css')
 
 block sidebar
-  nav.card.fl(style="width: 18rem")
+  nav.card.fl.col-2.ml-3
     div.card-header 小说管理
     ul.list-group.list-group-flush
       li.list-group-item
-        a.nav-link(href="#") 小说列表
+        a.nav-link(href="/admin/book/1") 小说列表
       li.list-group-item
         a.nav-link(href="/admin/book/add") 添加小说
 block content
-  table.table.table-striped.fl.ml-3.bg-white(style="width: 95rem")
-    thead
-      tr
-        th(scope="col") ID
-        th(scope="col") 名称
-        th(scope="col") 作者
-        th(scope="col") 分类
-        th(scope="col") 状态
-        th(scope="col") 操作
-    tbody
-      tr
-        th(scope="row") 1
-        td 圣墟
-        td 辰东
-        td 通用
-        td 连载中
-        td 
-          a.btn.btn-primary.mr-1(href="#") 爬取
-          a.btn.btn-primary.mr-1(href="#") 爬取规则
-          a.btn.btn-primary.mr-1(href="#") 修改
-          a.btn.btn-success.mr-1(href="#") 章节列表
-          a.btn.btn-danger.mr-1(href="#") 删除
+  div.row.col-9.ml-3.fl
+    table.table.table-striped.bg-white
+      thead
         tr
-          th(scope="row") 2
-          td 圣墟
-          td 辰东
-          td 通用
-          td 连载中
-          td 
-            a.btn.btn-primary.mr-1(href="#") 爬取
-            a.btn.btn-primary.mr-1(href="#") 爬取规则
-            a.btn.btn-primary.mr-1(href="#") 修改
-            a.btn.btn-success.mr-1(href="#") 章节列表
-            a.btn.btn-danger.mr-1(href="#") 删除
- 
+          th(scope="col") ID
+          th(scope="col") 名称
+          th(scope="col") 作者
+          th(scope="col") 分类
+          th(scope="col") 状态
+          th(scope="col") 操作
+      tbody
+        each item in data
+          tr
+            th(scope="row")= item.bookId
+            td= item.name
+            td= item.author
+            td= bookCache.classification[item.cid]
+            td= bookCache.state[item.state]
+            td
+              if item.resource
+                a.btn.btn-primary.mr-1(href="#") 爬取
+                a.btn.btn-primary.mr-1(href="#") 修改爬取规则
+              else
+                a.btn.btn-primary.mr-1(href="/admin/book/rule/add/" + item.bookId) 添加爬取规则
+              a.btn.btn-success.mr-1(href="#") 章节列表
+              a.btn.btn-danger.mr-1(href="/admin/book/del/" + item.bookId) 删除
+    nav.m-auto
+      ul.pagination
+        if pagination.length == 1 || pagination.page == 1
+          li.page-item.disabled
+            a.page-link(href="/admin/book/" + (pagination.page - 1), aria-label="Previous")
+              span(aria-hidden="true") &laquo;
+              span.sr-only Previous
+        else
+          li.page-item
+            a.page-link(href="/admin/book/" + (pagination.page - 1), aria-label="Previous")
+              span(aria-hidden="true") &laquo;
+              span.sr-only Previous
+        - for(var i = 1; i <= pagination.length; i++)
+          if i == pagination.page
+            li.page-item.active
+              a.page-link(href="/admin/book/" + i)= i
+          else
+            li.page-item
+              a.page-link(href="/admin/book/" + i)= i
+        if pagination.length == 1 || pagination.page == pagination.length
+          li.page-item.disabled
+            a.page-link(href="/admin/book/" + (parseInt(pagination.page) + 1), aria-label="Next")
+              span(aria-hidden="true") &raquo;
+              span.sr-only Next
+        else
+          li.page-item
+            a.page-link(href="/admin/book/" + (parseInt(pagination.page) + 1), aria-label="Next")
+              span(aria-hidden="true") &raquo;
+              span.sr-only Next
+        
+      

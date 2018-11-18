@@ -1,11 +1,11 @@
 extends book
-  
+
 block content
-  div.card.fl.ml-3.bg-white(style="width: 95rem")
+  div.card.fl.bg-white.col-9.ml-3
     div.card-header
       h4 添加小说信息
     div.card-body
-      form(method="post", enctype="multipart/form-data", action="/admin/book/add")
+      form#bookElement(enctype="multipart/form-data")
         div.from-group.row
           label.form-control-label.col-2(for="name") 小说名称
           div.col-10
@@ -28,16 +28,17 @@ block content
         div.form-group.row
           label.form-control-label.col-2(for="state") 小说状态
           label.col-2
-            input(type="radio", name="state", value="0",  checked) 
+            input(type="radio", name="state", value="0",  checked)
             |连载中
           label.col-2
-            input(type="radio", name="state", value="1") 
+            input(type="radio", name="state", value="1")
             |完结
         div.form-group.row
           label.form-control-label.col-2(for="cover") 小说封面上传
           div.col-10
-            input.form-control#cover(type="file")
+            input.form-control#cover(type="file", name="cover")
         div.form-group.row
           div.offset-2.col-10
-            button.btn.btn-primary 确认添加
-            
+            button.btn.btn-primary#btn-add-book(type="button") 确认添加
+block script
+  script(src="/admin/js/book_add.js")      

@@ -1,0 +1,38 @@
+extends book
+
+block content
+  .card.fl.bg-white.col-9.ml-3
+    .card-header
+      h4 添加爬取规则
+    .card-body
+      form#ruleElement(enctype="multipart/form-data")
+        .form-group.row
+          label.form-control-label.col-2(for="bookId") 小说ID
+          .col-10
+            input.form-control(type="text", name="bookId", value= id readonly)
+        .form-group.row
+          label.form-control-label.col-2(for="baseUrl") 爬取网站根网址
+          .col-10
+            input.form-control(type="text", name="url")
+        .form-group.row
+          label.form-control-label.col-2(for="url") 爬取网站对应小说目标网址
+          .col-10
+            input.form-control(type="text", name="url")
+        .form-group.row
+          label.form-control-label.col-2(for="firstSign") 目录页章节链接选择器
+          .col-10
+            input.form-control(type="text", name="firstSign")
+        .form-group.row
+          label.form-control-label.col-2(for="inwhatAttr") 内容页链接所在标签属性
+          .col-10
+            input.form-control(type="text", name="inwhatAttr")
+        .form-group.row
+          label.form-control-label.col-2(for="secondSign") 内容页章节内容选择器
+          .col-10
+            input.form-control(type="text", name="secondSign")
+        .form-group.row
+          .offset-2.col-10
+            button.btn.btn-primary#submit-rule(type="button") 确认添加
+
+block script
+  script(src="/admin/js/rule_add.js")

@@ -1,0 +1,9 @@
+{
+  "Dev": {
+    "dbConfig": {
+      "host": "localhost",
+      "port": 27017,
+      "dbName": "kel_novel"
+    }
+  }
+}
