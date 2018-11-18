@@ -34,9 +34,20 @@ MongoDb.prototype.del = async (collectionName, whereStr) => {
   if(IsExi){
     let rs = await rtDelRs(db, collectionName, whereStr);
     return rs;
+  }else{
+    return {status: 0, msg: '不存在该数据！'};
   }
 }
-
+MongoDb.prototype.update = async (collectionName, whereStr, updateStr) => {
+  let db = await dbConn(dbName);
+  let IsExi = await checkRepeat(db, collectionName, whereStr);
+  if(IsExi){
+    let rs = await rtUpdateRs(db, collectionName, whereStr, updateStr);
+    return rs;
+  }else{
+    return {status: 0, msg: '不存在该数据！'};
+  }
+}
 
 let dbConn = (dbName) => {
   return new Promise((resolve, reject) => {
@@ -119,6 +130,23 @@ let rtDelRs = (db, collectionName, whereStr) => {
   });
 }
 
+let rtUpdateRs = (db, collectionName, whereStr, updateStr) => {
+  return new Promise((resolve, reject) => {
+    db.collection(collectionName).updateOne(
+      whereStr,
+      {
+        $set: updateStr
+      },
+      (err, result) => {
+        if(err){
+          reject({status: 0, err: err});
+        }else{
+          resolve({status: 1, rs: result})
+        }
+      }
+    )
+  });
+}
 
 
 module.exports = MongoDb;

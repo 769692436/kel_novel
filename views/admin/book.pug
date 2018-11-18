@@ -33,7 +33,7 @@ block content
             td
               if item.resource
                 a.btn.btn-primary.mr-1(href="#") 爬取
-                a.btn.btn-primary.mr-1(href="#") 修改爬取规则
+                a.btn.btn-primary.mr-1(href="/admin/book/rule/add/" + item.bookId) 修改爬取规则
               else
                 a.btn.btn-primary.mr-1(href="/admin/book/rule/add/" + item.bookId) 添加爬取规则
               a.btn.btn-success.mr-1(href="#") 章节列表

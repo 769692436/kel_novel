@@ -87,6 +87,32 @@ router.post('/add', multipartMiddleware, (req, res, next) => {
 
 });
 
+
+router.post('/rule/add/:bookId', multipartMiddleware, (req, res, next) => {
+  let whereStr = {
+    bookId: parseInt(req.body.bookId)
+  }
+  let updateStr = {
+    resource: {
+      baseUrl: req.body.baseUrl,
+      url: req.body.url,
+      firstSign: req.body.firstSign,
+      inwhatAttr: req.body.inwhatAttr,
+      secondSign: req.body.secondSign
+    }
+  }
+  Book.update(bookCollection, whereStr, updateStr)
+    .then(data => {
+      if(data.status == 1){
+        res.send({status: 1, msg: '成功添加爬取规则'});
+      }else{
+        res.send({status: 0, msg: '无法添加爬取规则'});
+      }
+    }).catch(err => {
+        res.send({status: 0, msg: '无法添加爬取规则'});
+    });
+});
+
 let saveCover = async function(originPath, targetPath) {
   let data = await new Promise((resolve, reject) => {
     fs.readFile(originPath, (err, data) => {
