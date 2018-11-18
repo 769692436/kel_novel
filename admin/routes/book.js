@@ -113,6 +113,10 @@ router.post('/rule/add/:bookId', multipartMiddleware, (req, res, next) => {
     });
 });
 
+router.post('/crawl/:bookId', (req, res, next) => {
+  
+});
+
 let saveCover = async function(originPath, targetPath) {
   let data = await new Promise((resolve, reject) => {
     fs.readFile(originPath, (err, data) => {
