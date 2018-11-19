@@ -16,29 +16,35 @@ let crawl = async (rule, length) => {
   let currentSectionNum = length,
       readyToBrowserUrls = [],
       sectionContents = [];
-  console.log('sadasdasdasdadddddddddddddddddddddddddddddddddd');
   readyToBrowserUrls = await getBrowserUrls(rule, currentSectionNum);
   let updateSections = await getSection(rule, readyToBrowserUrls);
-  console.log(updateSections);
   return updateSections;
 }
 
 let getBrowserUrls = (rule, currentSectionNum) => {
-  let totalSectionNum = 0;
   return new Promise((resolve, reject) => {
+    let totalSectionNum = 0,
+        readyToBrowserUrls = [];
     request(rule.url, {encoding: null}, (err, res, body) => {
       if(err){
         reject(err);
       }else{
         let $ = cheerio.load(iconv.decode(body, 'gbk'));
         $(rule.firstSign).each((index, item) => {
-          let firstSignID = $(item).attr(url.inwhatAttr);
+          let firstSignID = $(item).attr(rule.inwhatAttr);
           let sectionNum = 0;
-          let psectionNum =  parseInt(removeNaN($(item).text()[0]));
-          if(isNaN(psectionNum)){
+          let psectionNum = 0;
+          let reg = new RegExp('第.*章');
+          let flag = reg.exec($(item).text());
+          if(flag){
+            psectionNum = removeNaN(flag[0]);
+          }else{
+            psectionNum =  removeNaN($(item).text());
+          }
+          if(isNaN(parseInt(psectionNum))){
             sectionNum = chinese_parseInt(psectionNum);
           }else{
-            sectionNum = psectionNum;
+            sectionNum = parseInt(psectionNum);
           }
           if(sectionNum > currentSectionNum){
             totalSectionNum++;
@@ -46,8 +52,6 @@ let getBrowserUrls = (rule, currentSectionNum) => {
             if(!isInArr(readyToBrowserUrls, href)){
               readyToBrowserUrls.push(href);
             }
-            // let sectionTitle = $(item).text()[0].substring($(item).text()[0].indexOf(removeNaN($(item).text()[0])) + 2 ).trim();
-            // console.log("sectionTitle-----------> ", sectionTitle);
           }
         });
         if(totalSectionNum >= 1){
@@ -81,10 +85,10 @@ let setSection = (rule, url, index) => {
 
       let sectionContentItem = {
         bookId: rule.bookId,
-        sectionTtile: $(rule.titleSign).text()[0],
+        sectionTtile: $(rule.titleSign).text(),
         sectionContent: $(rule.secondSign).html()
       }
-      ep.emit('getSection', {status: 1, data: sectionContentItem})
+      ep.emit('getSection', sectionContentItem)
     }
   });
 }
@@ -121,7 +125,7 @@ let isInArr = (arr, sameItem) =>{
         if(arr[i] == sameItem){
           return true;
         }else{
-          return false;
+          continue;
         }
       }
     }
@@ -168,5 +172,57 @@ let isArr = (arr) => {
   return arr && typeof (arr) == 'object' && arr.constructor == Array;
 }
 
+
+let chinese_parseInt = (str) => {
+  let chnNumChar = {
+      零:0,
+      一:1,
+      二:2,
+      三:3,
+      四:4,
+      五:5,
+      六:6,
+      七:7,
+      八:8,
+      九:9,
+  };
+
+  let chnNameValue = {
+      十:{value:10, secUnit:false},
+      百:{value:100, secUnit:false},
+      千:{value:1000, secUnit:false},
+      万:{value:10000, secUnit:true},
+      亿:{value:100000000, secUnit:true}
+  }
+  let rtn = 0;
+  let section = 0;
+  let number = 0;
+  let secUnit = false;
+  let nstr = str.split('');
+  if(nstr[0] == '十'){
+    number = 1;
+  }
+  for(let i = 0; i < nstr.length; i++){
+    let num = chnNumChar[nstr[i]];
+    if(typeof num !== 'undefined'){
+      number = num;
+      if(i === nstr.length - 1){
+        section += number;
+      }
+    }else{
+      let unit = chnNameValue[nstr[i]].value;
+      secUnit = chnNameValue[nstr[i]].secUnit;
+      if(secUnit){
+          section = (section + number) * unit;
+          rtn += section;
+          section = 0;
+      }else{
+          section += (number * unit);
+      }
+      number = 0;
+    }
+  }
+  return rtn + section;
+}
 
 module.exports = crawl;

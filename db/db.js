@@ -24,7 +24,7 @@ MongoDb.prototype.insertData = async (collectionName, insertData, whereStr) => {
 
 MongoDb.prototype.insertMany = async (collectionName, insertArr) => {
   let db = await dbConn(dbName);
-  let rs = await rtInsertManyRs(collectionName, insertArr);
+  let rs = await rtInsertManyRs(db, collectionName, insertArr);
   return rs;
 }
 

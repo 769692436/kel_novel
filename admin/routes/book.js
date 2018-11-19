@@ -129,12 +129,24 @@ router.post('/crawl', (req, res, next) => {
           .then(ldata => {
             Book.insertMany('book_content', ldata).then(rdata => {
               if(rdata.status ==1){
-                console.log(ldata.length,"<---------------------------");
-                res.send({status: 1, msg: '已爬取' + ldata.length + "个新章节"})
+                let currentLength = parseInt(data.rs[0].currentLength) + ldata.length;
+                console.log(ldata.length, currentLength,"<---------------------------");
+
+                Book.update(bookCollection, {bookId: req.body.bookId}, {currentLength: currentLength}).then(result => {
+                  if(result.status == 1){
+                    res.send({status: 1, msg: '已爬取' + ldata.length + "个新章节"})
+                  }else{
+                    res.send({status: 0, msg: '更新 currentLength 失败！'});
+                  }
+                }).catch(e => {
+                  res.send({status: 0, msg: '更新 currentLength 失败！'});
+                });
               }else{
                 res.send({status: 0, msg: '爬取失败！'});
               }
             })
+          }).catch(e => {
+
           })
       }else{
         res.send({status: 0, msg: '爬取失败！'});

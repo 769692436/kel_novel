@@ -6,9 +6,11 @@
       var data = {
         bookId: parseInt(e.target.parentNode.parentNode.firstChild.innerHTML)
       }
+      console.log(data);
       var xhr = new XMLHttpRequest();
       xhr.open('POST', '/admin/book/crawl', true);
-      xhr.send(data);
+      xhr.setRequestHeader("Content-type","application/json");
+      xhr.send(JSON.stringify(data));
       xhr.onreadystatechange = function(){
         if(xhr.readyState == 4 && xhr.status == 200){
           tips.style.opacity = 1;
