@@ -8,24 +8,29 @@ let bookCache = require('../../db/bookCache');
 let MongoDb = require('../../db/db');
 let Book = new MongoDb();
 let bookCollection = 'book';
+let crawl = require('../function/crawl');
 
 router.get('/:page', (req, res, next) => {
-  let page = req.params.page || 1;
-  Book.find(bookCollection, {})
-      .then(data => {
-        if(data.status == 1){
-          let maxPage = Math.ceil(data.rs.length / 10),
-              currentPage = page;
-          let start = (page - 1) * 10,
-              end = start + 10;
-          let rs = data.rs.slice(start, end);
-          res.render('admin/book', {data: rs, pagination: {length: maxPage, page: currentPage}, bookCache: bookCache});
-        }else{
+  if(req.params.page == 'add'){
+    next();
+  }else{
+    let page = req.params.page || 1;
+    Book.find(bookCollection, {})
+        .then(data => {
+          if(data.status == 1){
+            let maxPage = Math.ceil(data.rs.length / 10),
+                currentPage = page;
+            let start = (page - 1) * 10,
+                end = start + 10;
+            let rs = data.rs.slice(start, end);
+            res.render('admin/book', {data: rs, pagination: {length: maxPage, page: currentPage}, bookCache: bookCache});
+          }else{
 
-        }
-      }).catch(err => {
+          }
+        }).catch(err => {
 
-      });
+        });
+  }
 });
 
 router.get('/add', (req, res, next) => {
@@ -64,7 +69,7 @@ router.post('/add', multipartMiddleware, (req, res, next) => {
     cover: '',
     currentLength: 0,
     resource: null,
-    updateTime: new Date()
+    updateTime: new Date().toLocaleString()
   }
   let coverName = req.files.cover.originalFilename;
   let originPath = req.files.cover.path;
@@ -84,7 +89,6 @@ router.post('/add', multipartMiddleware, (req, res, next) => {
   }).catch(err => {
       console.log(err);
   });
-
 });
 
 
@@ -93,12 +97,15 @@ router.post('/rule/add/:bookId', multipartMiddleware, (req, res, next) => {
     bookId: parseInt(req.body.bookId)
   }
   let updateStr = {
+    updateTime: new Date().toLocaleString(),
     resource: {
+      bookId: req.body.bookId,
       baseUrl: req.body.baseUrl,
       url: req.body.url,
       firstSign: req.body.firstSign,
       inwhatAttr: req.body.inwhatAttr,
-      secondSign: req.body.secondSign
+      secondSign: req.body.secondSign,
+      titleSign: req.body.titleSign,
     }
   }
   Book.update(bookCollection, whereStr, updateStr)
@@ -113,8 +120,28 @@ router.post('/rule/add/:bookId', multipartMiddleware, (req, res, next) => {
     });
 });
 
-router.post('/crawl/:bookId', (req, res, next) => {
-  
+router.post('/crawl', (req, res, next) => {
+  Book.find(bookCollection, {bookId: req.body.bookId})
+    .then(data => {
+      if(data.status == 1){
+        console.log(data.rs[0]);
+        crawl(data.rs[0].resource, data.rs[0].currentLength)
+          .then(ldata => {
+            Book.insertMany('book_content', ldata).then(rdata => {
+              if(rdata.status ==1){
+                console.log(ldata.length,"<---------------------------");
+                res.send({status: 1, msg: '已爬取' + ldata.length + "个新章节"})
+              }else{
+                res.send({status: 0, msg: '爬取失败！'});
+              }
+            })
+          })
+      }else{
+        res.send({status: 0, msg: '爬取失败！'});
+      }
+    }).catch(err => {
+
+    });
 });
 
 let saveCover = async function(originPath, targetPath) {
