@@ -28,9 +28,9 @@ MongoDb.prototype.insertMany = async (collectionName, insertArr) => {
   return rs;
 }
 
-MongoDb.prototype.find = async (collectionName, whereStr) => {
+MongoDb.prototype.find = async (collectionName, whereStr, sortKey) => {
   let db = await dbConn(dbName);
-  let rs = await rtFindRs(db, collectionName, whereStr);
+  let rs = await rtFindRs(db, collectionName, whereStr, sortKey);
   return rs;
 }
 
@@ -112,9 +112,9 @@ let rtInsertRs = (db, collectionName, insertData) => {
   });
 }
 
-let rtFindRs = (db, collectionName, whereStr) => {
+let rtFindRs = (db, collectionName, whereStr, sortKey) => {
   return new Promise((resolve, reject) => {
-    db.collection(collectionName).find(whereStr).toArray((err, result) => {
+    db.collection(collectionName).find(whereStr).sort(sortKey).toArray((err, result) => {
       if(err){
         reject({status: 0, err: err});
       }else{

@@ -1,0 +1,22 @@
+extends book
+
+block content
+  .row.col-9.ml-3.fl
+    .card.col-12
+      .card-header.row
+        button.btn.btn-primary 添加小说章节内容
+      table.table.table-striped.bg-white
+        thead
+          tr
+            th(scope="col") 章节序号
+            th(scope="col") 标题
+            th(scope="col") 操作
+        tbody
+          each item in data
+            tr
+              th(scope="row")= item.sectionNum
+              td= item.sectionTtile
+              td
+                a.btn.btn-primary.mr-1.btn-modify(href="javascripts:;") 修改
+                a.btn.btn-danger.mr-1.btn-del(href="javascripts:;") 删除
+              

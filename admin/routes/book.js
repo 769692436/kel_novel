@@ -15,7 +15,7 @@ router.get('/:page', (req, res, next) => {
     next();
   }else{
     let page = req.params.page || 1;
-    Book.find(bookCollection, {})
+    Book.find(bookCollection, {}, {bookId: 1})
         .then(data => {
           if(data.status == 1){
             let maxPage = Math.ceil(data.rs.length / 10),
@@ -25,10 +25,10 @@ router.get('/:page', (req, res, next) => {
             let rs = data.rs.slice(start, end);
             res.render('admin/book', {data: rs, pagination: {length: maxPage, page: currentPage}, bookCache: bookCache});
           }else{
-
+            console.log(data);
           }
         }).catch(err => {
-
+          console.log(err);
         });
   }
 });
@@ -37,26 +37,66 @@ router.get('/add', (req, res, next) => {
   res.render('admin/book_add');
 });
 
-router.get('/del/:bookId', (req, res, next) => {
+router.get('/rule/add/:bookId', (req, res, next) => {
+  res.render('admin/rule_add', {id: req.params.bookId});
+});
+
+router.get('/content/:bookId/:page', (req, res, next) => {
+  let currentPage = parseInt(req.params.page);
+  let start = (currentPage - 1) * 10,
+      end = start + 10;
+  Book.find(bookCollection, {bookId: parseInt(req.params.bookId)}, {bookId: 1})
+    .then(result => {
+      console.log(result);
+      let maxPage = Math.ceil(result.rs[0].currentLength / 10);
+      if(result.status == 1){
+        Book.find('book_content', {bookId: parseInt(req.params.bookId), sectionNum: {$lte: end, $gte: start}}, {sectionNum: 1})
+          .then(data => {
+            console.log(data.rs.length,"dfbjaskdh");
+            if(data.status == 1){
+              console.log(maxPage);
+              res.render('admin/book_content', {data: data.rs, pagination: {length: maxPage, page: currentPage}});
+            }else{
+              console.log(data);
+            }
+          }).catch(e => {
+            console.log(e);
+          });
+      }else{
+        console.log(result);
+      }
+    }).catch(e => {
+      console.log(e);
+    });
+
+});
+
+router.post('/del', (req, res, next) => {
   let whereStr = {
-    bookId: parseInt(req.params.bookId)
+    bookId: parseInt(req.body.bookId)
   }
   console.log(whereStr);
   Book.del(bookCollection, whereStr)
     .then(data => {
       if(data.status == 1){
-        res.redirect('/admin/book/1');
+        Book.del('book_content', whereStr).then(data => {
+          if(data.status == 1){
+            res.send({status: 1, msg: '删除成功！'});
+          }else{
+            res.send({status: 0, msg: '章节内容删除失败！'});
+          }
+        }).catch(e => {
+          res.send({status: 0, msg: '章节内容删除失败！'});
+        });
       }else{
-
+        res.send({status: 0, msg: '小说概况删除失败！'});
       }
     }).catch(err => {
-
+      res.send({status: 0, msg: '小说概况删除失败！'});
     });
 });
 
-router.get('/rule/add/:bookId', (req, res, next) => {
-  res.render('admin/rule_add', {id: req.params.bookId});
-});
+
 
 
 router.post('/add', multipartMiddleware, (req, res, next) => {
@@ -64,8 +104,8 @@ router.post('/add', multipartMiddleware, (req, res, next) => {
     name: req.body.name,
     author: req.body.author,
     des: req.body.des,
-    cid: req.body.cid,
-    state: req.body.state,
+    cid: parseInt(req.body.cid),
+    state: parseInt(req.body.state),
     cover: '',
     currentLength: 0,
     resource: null,
@@ -99,7 +139,7 @@ router.post('/rule/add/:bookId', multipartMiddleware, (req, res, next) => {
   let updateStr = {
     updateTime: new Date().toLocaleString(),
     resource: {
-      bookId: req.body.bookId,
+      bookId: parseInt(req.body.bookId),
       baseUrl: req.body.baseUrl,
       url: req.body.url,
       firstSign: req.body.firstSign,
@@ -132,7 +172,7 @@ router.post('/crawl', (req, res, next) => {
                 let currentLength = parseInt(data.rs[0].currentLength) + ldata.length;
                 console.log(ldata.length, currentLength,"<---------------------------");
 
-                Book.update(bookCollection, {bookId: req.body.bookId}, {currentLength: currentLength}).then(result => {
+                Book.update(bookCollection, {bookId: parseInt(req.body.bookId)}, {currentLength: currentLength}).then(result => {
                   if(result.status == 1){
                     res.send({status: 1, msg: '已爬取' + ldata.length + "个新章节"})
                   }else{
@@ -144,10 +184,10 @@ router.post('/crawl', (req, res, next) => {
               }else{
                 res.send({status: 0, msg: '爬取失败！'});
               }
-            })
+            });
           }).catch(e => {
-
-          })
+            res.send({status: 0, msg: '爬取失败！'});
+          });
       }else{
         res.send({status: 0, msg: '爬取失败！'});
       }

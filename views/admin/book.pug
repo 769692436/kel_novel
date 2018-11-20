@@ -4,8 +4,8 @@ block style
   link(rel='stylesheet', href='/admin/css/book.css')
 
 block sidebar
-  nav.card.fl.col-2.ml-3
-    div.card-header 小说管理
+  nav.fl.col-2.ml-3
+    div.sidebar-head 小说管理
     ul.list-group.list-group-flush
       li.list-group-item
         a.nav-link(href="/admin/book/1") 小说列表
@@ -32,12 +32,12 @@ block content
             td= bookCache.state[item.state]
             td
               if item.resource
-                a.btn.btn-primary.mr-1.crawl-btn(href="#") 爬取
+                a.btn.btn-primary.mr-1.btn-crawl(href="javascripts:;") 爬取
                 a.btn.btn-primary.mr-1(href="/admin/book/rule/add/" + item.bookId) 修改爬取规则
               else
                 a.btn.btn-primary.mr-1(href="/admin/book/rule/add/" + item.bookId) 添加爬取规则
-              a.btn.btn-success.mr-1(href="#") 章节列表
-              a.btn.btn-danger.mr-1(href="/admin/book/del/" + item.bookId) 删除
+              a.btn.btn-success.mr-1(href="/admin/book/content/" + item.bookId + "/1") 章节列表
+              a.btn.btn-danger.mr-1.btn-del(href="javascripts:;") 删除
     nav.m-auto
       ul.pagination
         if pagination.length == 1 || pagination.page == 1
@@ -69,4 +69,4 @@ block content
               span.sr-only Next
         
 block script
-  script(src="/admin/js/crawl.js")
+  script(src="/admin/js/book.js")

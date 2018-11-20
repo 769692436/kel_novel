@@ -12,3 +12,10 @@
   opacity: 0;
   text-align: center;
 }
+.sidebar-head{
+  height: 5rem;
+  line-height: 5rem;
+  text-align: center;
+  background-color: #fff;
+  font-size: 30px;
+}

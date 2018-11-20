@@ -14,17 +14,17 @@ let ep = new eventProxy();
 
 let crawl = async (rule, length) => {
   let currentSectionNum = length,
-      readyToBrowserUrls = [],
+      readyToBrowser = [],
       sectionContents = [];
-  readyToBrowserUrls = await getBrowserUrls(rule, currentSectionNum);
-  let updateSections = await getSection(rule, readyToBrowserUrls);
-  return updateSections;
+  readyToBrowser = await getUrlsAndSectionNum(rule, currentSectionNum);
+  let rs = await getSection(rule, readyToBrowser);
+  return rs;
 }
 
-let getBrowserUrls = (rule, currentSectionNum) => {
+let getUrlsAndSectionNum = (rule, currentSectionNum) => {
   return new Promise((resolve, reject) => {
     let totalSectionNum = 0,
-        readyToBrowserUrls = [];
+        readyToBrowser = [];
     request(rule.url, {encoding: null}, (err, res, body) => {
       if(err){
         reject(err);
@@ -47,15 +47,20 @@ let getBrowserUrls = (rule, currentSectionNum) => {
             sectionNum = parseInt(psectionNum);
           }
           if(sectionNum > currentSectionNum){
-            totalSectionNum++;
             let href = myUrl.resolve(rule.url, firstSignID);
-            if(!isInArr(readyToBrowserUrls, href)){
-              readyToBrowserUrls.push(href);
+            let temp = {
+              url: href,
+              sectionNum: sectionNum
+            }
+            if(!isInArr(readyToBrowser, temp)){
+              console.log(sectionNum, currentSectionNum, totalSectionNum);
+              totalSectionNum++;
+              readyToBrowser.push(temp);
             }
           }
         });
         if(totalSectionNum >= 1){
-          resolve(readyToBrowserUrls);
+          resolve(readyToBrowser);
         }else{
           reject([]);
         }
@@ -64,31 +69,33 @@ let getBrowserUrls = (rule, currentSectionNum) => {
   });
 }
 
-let getSection = (rule, urls) => {
+let getSection = (rule, readyToBrowser) => {
   return new Promise((resolve, reject) => {
-    ep.after('getSection', urls.length, (allSection) => {
+    ep.after('getSection', readyToBrowser.length, (allSection) => {
+      console.log("所有章节请求完毕！");
       resolve(allSection);
     });
-    urls.forEach((url, index) => {
-      setSection(rule, url, index);
+    readyToBrowser.forEach((item, index) => {
+      setSection(rule, item, index);
     });
   });
-
 }
 
-let setSection = (rule, url, index) => {
-  request(url, {encoding: null}, (err, res, body) => {
-    if(err){
-      ep.emit('getSection', {status: 0, msg: '请求章节内容时发生错误！'})
-    }else{
+let setSection = (rule, item, index) => {
+  console.log(item.url);
+  request(item.url, {encoding: null}, (err, res, body) => {
+    if(!err && res.statusCode == 200){
       let $ = cheerio.load(iconv.decode(body, 'gbk'));
 
       let sectionContentItem = {
         bookId: rule.bookId,
+        sectionNum: parseInt(item.sectionNum),
         sectionTtile: $(rule.titleSign).text(),
         sectionContent: $(rule.secondSign).html()
       }
-      ep.emit('getSection', sectionContentItem)
+      ep.emit('getSection', sectionContentItem);
+    }else{
+      ep.emit('getSection', {status: 0, msg: '请求章节内容时发生错误！'});
     }
   });
 }
@@ -134,8 +141,8 @@ let isInArr = (arr, sameItem) =>{
 }
 
 let Compare = (objA, objB) => {
-  if(!isObj(onjA) || !isObj(objB)) return false;
-  if(getLength(objA) != getLength(onjB)) return false;
+  if(!isObj(objA) || !isObj(objB)) return false;
+  if(getLength(objA) != getLength(objB)) return false;
   return CompareObj(objA, objB, true);
 }
 
