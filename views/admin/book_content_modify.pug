@@ -1,0 +1,28 @@
+extends book
+
+block content
+  .card.col-9.fl.bg-white.ml-3
+    .card-header
+      h4 修改章节内容
+    .card-body
+      form#sectionItem
+        .form-group.row
+          input.form-control(type="text", name="_id", value=data._id hidden)
+        .form-group.row
+          label.form-control-label.col-2(for="sectionNum") 章节序号
+          .col-10
+            input.form-control(type="text", name="sectionNum", value=data.sectionNum)
+        .form-group.row
+          label.form-control-label.col-2(for="sectionTtile") 章节标题
+          .col-10
+            input.form-control(type="text", name="sectionTtile", value=data.sectionTtile)
+        .form-group.row
+          label.form-control-label.col-2(for="sectionContent") 章节内容
+          .col-10
+            textarea.form-control(type="text", name="sectionContent" style="resize: none;", rows="30")= data.sectionContent
+        .form-group.row
+          .offset-2.col-10
+            button.btn.btn-success#btn-submit(type="button") 确认修改
+            a.btn.btn-primary.ml-3(href="/admin/book/1") 取消
+block script
+  script(src="/admin/js/content_modify.js")     

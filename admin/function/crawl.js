@@ -85,17 +85,23 @@ let setSection = (rule, item, index) => {
   console.log(item.url);
   request(item.url, {encoding: null}, (err, res, body) => {
     if(!err && res.statusCode == 200){
-      let $ = cheerio.load(iconv.decode(body, 'gbk'));
+      let $ = cheerio.load(iconv.decode(body, 'gbk'), {decodeEntities: false});
 
       let sectionContentItem = {
-        bookId: rule.bookId,
+        bookId: parseInt(rule.bookId),
         sectionNum: parseInt(item.sectionNum),
         sectionTtile: $(rule.titleSign).text(),
         sectionContent: $(rule.secondSign).html()
       }
       ep.emit('getSection', sectionContentItem);
     }else{
-      ep.emit('getSection', {status: 0, msg: '请求章节内容时发生错误！'});
+      let sectionContentItem = {
+        bookId: parseInt(rule.bookId),
+        sectionNum: parseInt(item.sectionNum),
+        sectionTtile: '爬取失败！',
+        sectionContent: ''
+      }
+      ep.emit('getSection', sectionContentItem);
     }
   });
 }
@@ -231,5 +237,8 @@ let chinese_parseInt = (str) => {
   }
   return rtn + section;
 }
+
+
+
 
 module.exports = crawl;

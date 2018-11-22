@@ -14,9 +14,10 @@ block content
         tbody
           each item in data
             tr
+              td(hidden)= item._id
               th(scope="row")= item.sectionNum
               td= item.sectionTtile
               td
-                a.btn.btn-primary.mr-1.btn-modify(href="javascripts:;") 修改
+                a.btn.btn-primary.mr-1.btn-modify(href="/admin/book/content/modify/" + item._id) 修改
                 a.btn.btn-danger.mr-1.btn-del(href="javascripts:;") 删除
               

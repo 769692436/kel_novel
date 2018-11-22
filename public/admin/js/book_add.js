@@ -3,7 +3,7 @@
   var tips = document.getElementById('tips');
   bookAddBtn.onclick = function(){
     var formElement = document.getElementById('bookElement');
-    var formData = new FormData(bookElement);
+    var formData = new FormData(formElement);
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/admin/book/add', true);
     xhr.send(formData);
@@ -22,5 +22,4 @@
       }
     }
   };
-
 })();
